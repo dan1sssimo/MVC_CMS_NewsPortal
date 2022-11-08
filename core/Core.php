@@ -1,11 +1,12 @@
 <?php
 
+
 namespace core;
 
 /**
- * Головний клас ядра системи.
+ * Головний клас ядра системи
  * (синглтон)
- * */
+ */
 class Core
 {
     private static $instance;
@@ -16,17 +17,26 @@ class Core
     {
         global $Config;
         spl_autoload_register('\core\Core::__autoload');
-        self::$db = new \core\DB($Config['Database']['Server'],
+        self::$db = new \core\DB(
+            $Config['Database']['Server'],
             $Config['Database']['Username'],
             $Config['Database']['Password'],
-            $Config['Database']['Database']);
+            $Config['Database']['Database']
+        );
+    }
 
+    /**
+     * Отримати обєкт-зєднання з базою даних
+     */
+    public function getDB()
+    {
+        return self::$db;
     }
 
     /**
      * Повертає екземпляр ядра системи
      * @return Core
-     * */
+     */
     public static function getInstance()
     {
         if (empty(self::$instance)) {
@@ -35,23 +45,19 @@ class Core
         } else
             return self::$instance;
     }
-    /**
-     * Отримання методу дб.
-     * */
-    public function getDB()
-    {
-        return self::$db;
-    }
 
     /**
-     * Ініціалізація системи.
-     * */
+     * Ініціалізація системи
+     */
     public function init()
     {
         session_start();
         self::$mainTemplate = new Template();
     }
 
+    /**
+     * Виконує основний процес роботи CMS-системи
+     */
     public function run()
     {
         $path = $_GET['path'];
@@ -71,34 +77,32 @@ class Core
             if (method_exists($controller, $fullMethodName)) {
                 $method = new \ReflectionMethod($fullClassName, $fullMethodName);
                 $paramsArray = [];
-                foreach ($method->getParameters() as $parameter)
+                foreach ($method->getParameters() as $parameter) {
                     array_push($paramsArray, isset($_GET[$parameter->name]) ? $_GET[$parameter->name] : null);
+                }
                 $result = $method->invokeArgs($controller, $paramsArray);
                 if (is_array($result)) {
                     self::$mainTemplate->setParams($result);
                 }
             } else
-                throw new \Exception('404 Not Found');
+                header('Location: /notFound');
         } else
-            throw new \Exception('404 Not Found');
-        // echo "Class : {$className}, method : {$methodName}";
+            header('Location: /notFound');
     }
 
     /**
-     * Завершення роботи системи та виведення рез.
-     * */
+     * Завершення роботи системи та виведення результату
+     */
     public function done()
     {
         self::$mainTemplate->display('views/layout/index.php');
     }
 
     /**
-     * Автозавантажувач класів.
-     * @param $className string Назва класу.
-     * */
-
-    public
-    static function __autoload($className)
+     * Автозавантажувач класів
+     * @param $className string Назва класу
+     */
+    public static function __autoload($className)
     {
         $fileName = $className . '.php';
         if (is_file($fileName))

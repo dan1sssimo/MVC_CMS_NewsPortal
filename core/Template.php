@@ -1,6 +1,8 @@
 <?php
 
+
 namespace core;
+
 
 /**
  * Клас шаблонізатора
@@ -9,29 +11,23 @@ namespace core;
 class Template
 {
     protected $parameters;
-
     public function __construct()
     {
-        $this->parameters = [];
+        $this->parameters=[];
     }
-
     public function setParam($name, $value)
     {
         $this->parameters[$name] = $value;
     }
-
     public function getParam($name)
     {
         return $this->parameters[$name];
     }
-
     public function setParams($array)
     {
-        foreach ($array as $key => $value) {
-            $this->parameters[$key] = $value;
-        }
+        foreach ($array as $key => $value)
+        $this->parameters[$key] = $value;
     }
-
     public function render($path)
     {
         extract($this->parameters);
@@ -41,9 +37,9 @@ class Template
         ob_end_clean();
         return $html;
     }
-
     public function display($path)
     {
         echo $this->render($path);
     }
+
 }

@@ -1,9 +1,11 @@
 <?php
 
+
 namespace core;
 
+
 /**
- * Базовий клас для всіх контроллерів
+ * Базовий клас для всіх контролерів
  * @package core
  */
 class Controller
@@ -16,30 +18,20 @@ class Controller
             return false;
     }
 
-    public function isGet()
-    {
-        if ($_SERVER['REQUEST_METHOD'] == 'GET')
-            return true;
-        else
-            return false;
-
-    }
-
     public function postFilter($fields)
     {
         return Utils::ArrayFilter($_POST, $fields);
     }
 
-    public function render($viewsName, $localParams = null, $globalParams = null)
+    public function render($viewName, $localParams = null, $globalParams = null)
     {
         $tpl = new Template();
         if (is_array($localParams))
             $tpl->setParams($localParams);
-        if (!is_array($globalParams)) {
+        if (!is_array($globalParams))
             $globalParams = [];
-        }
         $moduleName = strtolower((new \ReflectionClass($this))->getShortName());
-        $globalParams['PageContent'] = $tpl->render("views/{$moduleName}/{$viewsName}.php");
+        $globalParams['PageContent'] = $tpl->render("views/{$moduleName}/{$viewName}.php");
         return $globalParams;
     }
 
@@ -66,4 +58,5 @@ class Controller
         $globalParams['PageContent'] = $tpl->render("views/layout/message.php");
         return $globalParams;
     }
+
 }
